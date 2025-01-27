@@ -14,15 +14,16 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Qml)
 
 set(PROJECT_SOURCES
         main.cpp
-        calc.cpp
-        calc.h
-        calc.ui
+
+
+
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Calculator
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        calc.h calc.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Calculator APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

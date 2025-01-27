@@ -1,192 +1,104 @@
 #include "calc.h"
-#include "./ui_calc.h"
-
-#include <stdexcept>
-
+#include <QGridLayout>
 #include <QJSEngine>
+
 #include <QDebug>
-#include <QPalette>
 
 Calc::Calc(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::Calc)
+    : QWidget{parent}
 {
-    ui->setupUi(this);
-    ui->ButtonResult->setPalette(QPalette(Qt::blue));
+    this->setWindowTitle("Calculator");
+    this->resize(400, 580);
+    this->setMinimumSize(400, 580);
+    this->setMaximumSize(1920, 1080);
 
-    connect(ui->Button_0, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->Button_1, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->Button_2, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->Button_3, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->Button_4, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->Button_5, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->Button_6, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->Button_7, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->Button_8, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->Button_9, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->ButtonDiv, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->ButtonMult, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->ButtonSub, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->ButtonAdd, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-    connect(ui->ButtonClear, &QPushButton::clicked, this, &Calc::buttonClickedCommon);
-}
+    display = new QLineEdit;
+    display->setAlignment(Qt::AlignLeft);
+    display->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-Calc::~Calc()
-{
-    delete ui;
-}
-
-void Calc::buttonClickedCommon()
-{
-    if (!ui->label->text().isEmpty())
+    for (std::size_t i = 0; i < countButtons; i++)
     {
-        ui->label->setText(QString());
+        digitButtons[i] = createButton(QString::number(i), &Calc::digitClicked);
     }
+
+    QToolButton* clearButton = createButton("C", &Calc::clearClicked);
+    QToolButton* leftBracketButton = createButton("(", &Calc::anotherButtonClicked);
+    QToolButton* rightBracketButton = createButton(")", &Calc::anotherButtonClicked);
+    QToolButton* pointButton = createButton(".", &Calc::anotherButtonClicked);
+    QToolButton* divButton = createButton("/", &Calc::anotherButtonClicked);
+    QToolButton* multButton = createButton("*", &Calc::anotherButtonClicked);
+    QToolButton* subButton = createButton("-", &Calc::anotherButtonClicked);
+    QToolButton* addButton = createButton("+", &Calc::anotherButtonClicked);
+    QToolButton* equalButton = createButton("=", &Calc::equalClicked);
+
+    QGridLayout* mainLayout = new QGridLayout(this);
+    mainLayout->addWidget(display, 0, 0, 1, 5);
+    mainLayout->addWidget(digitButtons[7], 1, 0);
+    mainLayout->addWidget(digitButtons[8], 1, 1);
+    mainLayout->addWidget(digitButtons[9], 1, 2);
+    mainLayout->addWidget(multButton, 1, 3);
+    mainLayout->addWidget(equalButton, 1, 4, 2, 1);
+    mainLayout->addWidget(digitButtons[4], 2, 0);
+    mainLayout->addWidget(digitButtons[5], 2, 1);
+    mainLayout->addWidget(digitButtons[6], 2, 2);
+    mainLayout->addWidget(divButton, 2, 3);
+    mainLayout->addWidget(digitButtons[1], 3, 0);
+    mainLayout->addWidget(digitButtons[2], 3, 1);
+    mainLayout->addWidget(digitButtons[3], 3, 2);
+    mainLayout->addWidget(addButton, 3, 3);
+    mainLayout->addWidget(clearButton, 3, 4);
+    mainLayout->addWidget(digitButtons[0], 4, 0);
+    mainLayout->addWidget(leftBracketButton, 4, 1);
+    mainLayout->addWidget(rightBracketButton, 4, 2);
+    mainLayout->addWidget(subButton, 4, 3);
+    mainLayout->addWidget(pointButton, 4, 4);
+
+    this->setLayout(mainLayout);
 }
 
-void Calc::addToExpression(const QString& sign)
-{
-    ui->expressionLine->setText(ui->expressionLine->text() + sign);
-}
-
-
-void Calc::on_Button_0_clicked()
-{
-    addToExpression("0");
-}
-
-
-
-void Calc::on_Button_Comma_clicked()
-{
-    addToExpression(",");
-}
-
-
-void Calc::on_ButtonClear_clicked()
-{
-    ui->expressionLine->clear();
-}
-
-
-void Calc::on_Button_3_clicked()
-{
-    addToExpression("3");
-}
-
-
-void Calc::on_Button_2_clicked()
-{
-    addToExpression("2");
-}
-
-
-void Calc::on_Button_1_clicked()
-{
-    addToExpression("1");
-}
-
-
-void Calc::on_Button_6_clicked()
-{
-    addToExpression("6");
-}
-
-
-void Calc::on_Button_5_clicked()
-{
-    addToExpression("5");
-}
-
-
-void Calc::on_Button_4_clicked()
-{
-    addToExpression("4");
-}
-
-
-void Calc::on_Button_9_clicked()
-{
-    addToExpression("9");
-}
-
-
-void Calc::on_Button_8_clicked()
-{
-    addToExpression("8");
-}
-
-
-void Calc::on_Button_7_clicked()
-{
-    addToExpression("7");
-}
-
-
-void Calc::on_ButtonSub_clicked()
-{
-    addToExpression("-");
-}
-
-
-void Calc::on_ButtonAdd_clicked()
-{
-    addToExpression("+");
-}
-
-
-void Calc::on_ButtonMult_clicked()
-{
-    addToExpression("×");
-}
-
-
-void Calc::on_ButtonDiv_clicked()
-{
-    addToExpression("÷");
-}
-
-
-void Calc::on_ButtonResult_clicked()
-{
-    try
-    {
-        QString result = resultOfExpression();
-        if (!result.isEmpty() && result != "nan")
-        {
-            ui->expressionLine->setText(result);
-        }
-    }
-    catch (const std::exception& e)
-    {
-        ui->label->setText(e.what());
-    }
-}
-
-QString Calc::resultOfExpression()
+void Calc::equalClicked()
 {
     QJSEngine engine;
-    QString expression = ui->expressionLine->text();
-    expression.replace("÷", "/");
-    expression.replace("×", "*");
-    expression.replace(',', '.');
-    QJSValue result = engine.evaluate(expression);
+    QJSValue result = engine.evaluate(display->text());
     if (result.isError())
     {
-        throw std::runtime_error("Недопустимое выражение!");
+        // pass
     }
-    return QString::number(result.toNumber()).replace('.', ',');
+    display->setText(QString::number(result.toNumber()));
 }
 
-
-void Calc::on_Button_rightB_clicked()
+void Calc::anotherButtonClicked()
 {
-    addToExpression(")");
+    QToolButton* button = qobject_cast<QToolButton*>(sender());
+    if (!button)
+    {
+        return;
+    }
+    display->setText(display->text() + button->text());
 }
 
-
-void Calc::on_Button_leftB_clicked()
+void Calc::clearClicked()
 {
-    addToExpression("(");
+    display->setText("");
 }
 
+template <typename PointerToSlot>
+QToolButton* Calc::createButton(const QString& text, const PointerToSlot& slot)
+{
+    QToolButton* button = new QToolButton();
+    QObject::connect(button, &QToolButton::clicked, this, slot);
+    button->setText(text);
+    button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    return button;
+}
+
+void Calc::digitClicked()
+{
+    QToolButton* button = qobject_cast<QToolButton*>(sender());
+    if (!button)
+    {
+        return;
+    }
+    int valueOfButton = button->text().toInt();
+    display->setText(display->text() + QString::number(valueOfButton));
+}
