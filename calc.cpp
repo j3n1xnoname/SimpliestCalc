@@ -1,8 +1,11 @@
 #include "calc.h"
+#include "scrollbutton.h"
 #include <QGridLayout>
 #include <QJSEngine>
 
 #include <QShortcut>
+#include <QDebug>
+#include <qscrollbar.h>
 
 Calc::Calc(QWidget *parent)
     : QWidget{parent}
@@ -50,7 +53,17 @@ Calc::Calc(QWidget *parent)
                                "background-color: blue;"
                                "}");
 
-    QGridLayout* mainLayout = new QGridLayout(this);
+
+    buttonContainer = new QWidget(this);
+    buttonLayout = new QVBoxLayout(buttonContainer);
+    buttonContainer->setLayout(buttonLayout);
+    scrollArea = new QScrollArea;
+    scrollArea->setWidget(buttonContainer);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    QGridLayout* mainLayout = new QGridLayout;
     mainLayout->addWidget(display, 0, 0, 1, 5);
     mainLayout->addWidget(correctExp, 1, 0, 1, 5);
     mainLayout->addWidget(digitButtons[7], 2, 0);
@@ -73,19 +86,48 @@ Calc::Calc(QWidget *parent)
     mainLayout->addWidget(subButton, 5, 3);
     mainLayout->addWidget(pointButton, 5, 4);
 
-    this->setLayout(mainLayout);
+    QVBoxLayout* mainVerticalLayout = new QVBoxLayout(this);
+    mainVerticalLayout->addWidget(scrollArea);
+    mainVerticalLayout->addLayout(mainLayout);
+
+    this->setLayout(mainVerticalLayout);
+
+    display->setFocus();
+}
+
+void Calc::addButtonToHistory(const double resultDouble, const QString& textExpression)
+{
+    ScrollButton* button = new ScrollButton(buttonContainer, resultDouble, textExpression);
+    button->setMinimumSize(350, 30);
+    button->resize(350, 30);
+    button->setText(textExpression + " = " + QString::number(resultDouble));
+    button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    QObject::connect(button, &ScrollButton::clicked, this, &Calc::showResultOfExpression);
+
+    buttonLayout->addWidget(button);
+    buttonLayout->setAlignment(Qt::AlignTop);
+    scrollArea->verticalScrollBar()->setMaximum(scrollArea->verticalScrollBar()->maximum() + button->height());
+    scrollArea->verticalScrollBar()->setValue(scrollArea->verticalScrollBar()->maximum());
+}
+
+void Calc::showResultOfExpression()
+{
+    display->setText(QString::number(qobject_cast<ScrollButton*>(this->sender())->getResult()));
+    display->setFocus();
 }
 
 void Calc::equalClicked()
 {
     QJSEngine engine;
     QJSValue result = engine.evaluate(display->text());
-    if (result.isError() || result.toString() == "nan")
+    if (result.isError() || result.toString() == "nan" || display->text().isEmpty())
     {
         correctExp->setText("Некорректное выражение");
         return;
     }
-    display->setText(QString::number(result.toNumber()));
+    double resultDouble = result.toNumber();
+    addButtonToHistory(resultDouble, display->text());
+    display->setText(QString::number(resultDouble));
 }
 
 void Calc::displayTextChanged()
