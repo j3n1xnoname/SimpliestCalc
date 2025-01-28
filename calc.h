@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QToolButton>
+#include <QPushButton>
 #include <QLineEdit>
 #include <QLabel>
 #include <QVBoxLayout>
@@ -23,12 +24,15 @@ private slots:
     void displayTextChanged();
     void showResultOfExpression();
 
+    void changeTheme();
+
 signals:
 
 private:
     template <typename PointerToSlot>
     QToolButton* createButton(const QString& text, const PointerToSlot& slot);
     void addButtonToHistory(const double resultDouble, const QString& textExpression);
+    void setUpStyle();
 
     enum {countButtons = 10};
     QToolButton* digitButtons[countButtons];
@@ -38,6 +42,9 @@ private:
     QVBoxLayout* buttonLayout;
     QWidget* buttonContainer;
     QScrollArea* scrollArea;
+
+    bool isWhiteTheme;
+    QPushButton* themeButton;
 };
 
 #endif // CALC_H

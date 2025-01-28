@@ -8,14 +8,8 @@
 #include <qscrollbar.h>
 
 Calc::Calc(QWidget *parent)
-    : QWidget{parent}
+    : QWidget{parent}, isWhiteTheme(true)
 {
-    this->setStyleSheet("QWidget {"
-                        "font-size: 18px;"
-                        "color: black;"
-                        "background-color: white;"
-                        "}");
-
     this->setWindowTitle("Calculator");
     this->resize(400, 580);
     this->setMinimumSize(400, 580);
@@ -86,13 +80,60 @@ Calc::Calc(QWidget *parent)
     mainLayout->addWidget(subButton, 5, 3);
     mainLayout->addWidget(pointButton, 5, 4);
 
+    themeButton = new QPushButton();
+    themeButton->setFixedSize(25, 25);
+    themeButton->setIconSize(QSize(25, 25));
+    QObject::connect(themeButton, &QPushButton::clicked, this, &Calc::changeTheme);
+
+
     QVBoxLayout* mainVerticalLayout = new QVBoxLayout(this);
+    mainVerticalLayout->addWidget(themeButton);
     mainVerticalLayout->addWidget(scrollArea);
     mainVerticalLayout->addLayout(mainLayout);
 
     this->setLayout(mainVerticalLayout);
 
     display->setFocus();
+    setUpStyle();
+}
+
+void Calc::changeTheme()
+{
+    isWhiteTheme = !isWhiteTheme;
+    setUpStyle();
+}
+
+void Calc::setUpStyle()
+{
+    if (isWhiteTheme)
+    {
+        this->setStyleSheet("QWidget {"
+                            "font-size: 18px;"
+                            "color: black;"
+                            "background-color: white;"
+                            "}"
+                            "QPushButton {border: 0px; color: black}"
+                            "QToolButton {"
+                            "border: 0.5px solid gray; color: black;"
+                            "}"
+                            "QLineEdit {border: 0.5px solid gray; color: black}"
+                            "QScrollArea {border: 0.5px solid gray; color: black}");
+
+        themeButton->setIcon(QIcon(":/moon.png"));
+        return;
+    }
+    this->setStyleSheet("QWidget {"
+                        "font-size: 18px;"
+                        "color: while;"
+                        "background-color: black;"
+                        "}"
+                        "QPushButton {border: 0px; color: white;}"
+                        "QToolButton {"
+                        "border: 0.5px solid gray; color: white"
+                        "}"
+                        "QLineEdit {border: 0.5px solid gray; color: white;}"
+                        "QScrollArea {border: 0.5px solid gray; color: white;}");
+    themeButton->setIcon(QIcon(":/sun.png"));
 }
 
 void Calc::addButtonToHistory(const double resultDouble, const QString& textExpression)
