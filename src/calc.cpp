@@ -1,11 +1,10 @@
 #include "calc.h"
 #include "scrollbutton.h"
+#include "qscrollbar.h"
+
 #include <QGridLayout>
 #include <QJSEngine>
-
 #include <QShortcut>
-#include <QDebug>
-#include <qscrollbar.h>
 
 Calc::Calc(QWidget *parent)
     : QWidget{parent}, isWhiteTheme(true)

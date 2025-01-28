@@ -9,11 +9,14 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Qml)
 
+include_directories(include)
+
 set(PROJECT_SOURCES
-        main.cpp
+        src/main.cpp
 
 
 
@@ -23,9 +26,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Calculator
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        calc.h calc.cpp
-        scrollbutton.h scrollbutton.cpp
-        res.qrc
+        include/calc.h src/calc.cpp
+        include/scrollbutton.h src/scrollbutton.cpp
+        resources/res.qrc
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Calculator APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
