@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QToolButton>
 #include <QLineEdit>
+#include <QLabel>
 
 class Calc : public QWidget
 {
@@ -17,6 +18,8 @@ private slots:
     void equalClicked();
     void anotherButtonClicked();
 
+    void displayTextChanged();
+
 signals:
 
 private:
@@ -26,6 +29,7 @@ private:
     enum {countButtons = 10};
     QToolButton* digitButtons[countButtons];
     QLineEdit* display;
+    QLabel* correctExp;
 };
 
 #endif // CALC_H
